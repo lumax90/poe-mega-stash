@@ -1,0 +1,35 @@
+{
+  "name": "poe-item-finder",
+  "version": "1.0.0",
+  "description": "Universal item search engine for Path of Exile",
+  "main": "./electron/main.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview"
+  },
+  "keywords": [
+    "poe",
+    "path-of-exile",
+    "stash",
+    "item-finder"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "axios": "^1.9.0",
+    "electron-store": "^10.0.1",
+    "electron-vite": "^5.0.0",
+    "fuse.js": "^7.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-virtualized-auto-sizer": "^2.0.3",
+    "react-window": "^1.8.10",
+    "vite": "^6.0.0",
+    "zustand": "^5.0.5"
+  },
+  "devDependencies": {
+    "electron": "^36.3.1"
+  }
+}
