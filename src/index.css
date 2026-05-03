@@ -155,8 +155,23 @@ select,
   letter-spacing: -0.2px;
 }
 
-.sidebar-logo .logo-icon {
-  font-size: 20px;
+/* Zoom slightly so centered artwork fills frame; clips excess letterbox padding */
+.sidebar-logo .logo-icon-wrap {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-logo .logo-icon-wrap .logo-icon {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transform: scale(1.38);
+  transform-origin: center center;
 }
 
 .sidebar-subtitle {

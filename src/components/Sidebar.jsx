@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/app-store'
 import UpdateChecker from './UpdateChecker'
+import appIcon from '../assets/app-icon.png'
 
 export default function Sidebar() {
   const {
@@ -54,7 +55,9 @@ export default function Sidebar() {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <span className="logo-icon">💎</span>
+          <div className="logo-icon-wrap">
+            <img className="logo-icon" src={appIcon} alt="" draggable={false} />
+          </div>
           <h1>PoE Mega Stash</h1>
         </div>
         <div className="sidebar-subtitle">Search. Find. Track Wealth.</div>

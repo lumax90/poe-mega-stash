@@ -1,6 +1,6 @@
 {
   "name": "poe-item-finder",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Universal item search engine for Path of Exile",
   "main": "./electron/main.js",
   "repository": {
@@ -48,6 +48,7 @@
   "build": {
     "appId": "com.lumax90.poemegastash",
     "productName": "PoE Mega Stash",
+    "icon": "src/assets/app-icon.png",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release"
