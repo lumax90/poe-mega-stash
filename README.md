@@ -4,6 +4,15 @@ Desktop companion for **Path of Exile** (PC): stash + character gear sync, searc
 
 **Built with AI.** Although everything has been reviewed, use it with caution.
 
+## Screenshots
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="public/Screenshots/screenshot-1.png" alt="PoE Mega Stash — main UI" width="400"/></td>
+<td align="center" width="50%"><img src="public/Screenshots/screenshot-2.png" alt="PoE Mega Stash — item detail" width="400"/></td>
+</tr>
+</table>
+
 ## Downloads
 
 **Windows** (`.exe`) and **macOS** (`.dmg` / `.zip`) installers are on **[GitHub Releases](https://github.com/lumax90/poe-mega-stash/releases)**.
