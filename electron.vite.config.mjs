@@ -10,7 +10,7 @@ export default defineConfig({
         entry: resolve(import.meta.dirname, 'electron/main.js')
       },
       rollupOptions: {
-        external: ['electron', 'electron-store']
+        external: ['electron', 'electron-store', 'electron-updater']
       }
     }
   },

@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/app-store'
+import UpdateChecker from './UpdateChecker'
 
 export default function Sidebar() {
   const {
@@ -138,12 +139,15 @@ export default function Sidebar() {
             <span className="nav-icon">📖</span>
             <span>Guide</span>
           </div>
-          <div
-            className={`nav-item ${currentView === 'settings' ? 'active' : ''}`}
-            onClick={() => setCurrentView('settings')}
-          >
-            <span className="nav-icon">⚙️</span>
-            <span>Settings</span>
+          <div className="sidebar-settings-row">
+            <div
+              className={`nav-item nav-settings-main ${currentView === 'settings' ? 'active' : ''}`}
+              onClick={() => setCurrentView('settings')}
+            >
+              <span className="nav-icon">⚙️</span>
+              <span>Settings</span>
+            </div>
+            <UpdateChecker />
           </div>
         </div>
 

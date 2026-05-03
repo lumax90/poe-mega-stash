@@ -1,16 +1,23 @@
 {
   "name": "poe-item-finder",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Universal item search engine for Path of Exile",
   "main": "./electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lumax90/poe-mega-stash.git"
+  },
   "scripts": {
     "sync-guide": "node scripts/sync-guide.mjs",
     "postinstall": "node scripts/sync-guide.mjs",
     "predev": "node scripts/sync-guide.mjs",
     "prebuild": "node scripts/sync-guide.mjs",
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
-    "preview": "electron-vite preview"
+    "build": "electron-vite build && node scripts/copy-electron-main.mjs",
+    "preview": "electron-vite preview",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "release": "npm run build && electron-builder --publish always"
   },
   "keywords": [
     "poe",
@@ -24,6 +31,7 @@
     "@vitejs/plugin-react": "^4.0.0",
     "axios": "^1.9.0",
     "electron-store": "^10.0.1",
+    "electron-updater": "^6.8.3",
     "electron-vite": "^5.0.0",
     "fuse.js": "^7.1.0",
     "react": "^19.1.0",
@@ -34,6 +42,55 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "electron": "^36.3.1"
+    "electron": "^36.3.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.lumax90.poemegastash",
+    "productName": "PoE Mega Stash",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "lumax90",
+      "repo": "poe-mega-stash"
+    },
+    "extraMetadata": {
+      "main": "dist/main/main.js"
+    },
+    "mac": {
+      "category": "public.app-category.games",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

@@ -39,5 +39,14 @@ contextBridge.exposeInMainWorld('poeApi', {
   // Storage
   getSavedData: () => ipcRenderer.invoke('storage:get'),
   getSettings: () => ipcRenderer.invoke('settings:get'),
-  saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings)
+  saveSettings: (settings) => ipcRenderer.invoke('settings:save', settings),
+
+  updaterGetStatus: () => ipcRenderer.invoke('updater:getStatus'),
+  updaterCheck: () => ipcRenderer.invoke('updater:check'),
+  updaterInstall: () => ipcRenderer.invoke('updater:install'),
+  onUpdaterPush: (callback) => {
+    const handler = (_event, data) => callback(data)
+    ipcRenderer.on('updater:push', handler)
+    return () => ipcRenderer.removeListener('updater:push', handler)
+  }
 })

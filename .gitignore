@@ -1,5 +1,6 @@
 node_modules/
 dist/
+release/
 # Generated from README.md (see npm run sync-guide)
 src/content/guide.md
 out/
