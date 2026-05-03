@@ -53,13 +53,5 @@ Data stays **local**. Not affiliated with GGG — see their [terms](https://www.
 git clone https://github.com/lumax90/poe-mega-stash.git
 cd poe-mega-stash
 npm install
-npm run dev          # development
-npm run dist         # installers → release/
-npm run release      # publish (needs GH_TOKEN); bump version first
+npm run dev
 ```
-
----
-
-## Editing this guide (contributors)
-
-Edit **README.md** only. The in-app Guide copies via `npm run sync-guide` (also on `npm install` / `npm run dev` / `npm run build`).
