@@ -73,8 +73,8 @@
       ]
     },
     "win": {
+      "forceCodeSigning": false,
       "signAndEditExecutable": false,
-      "signDlls": false,
       "verifyUpdateCodeSignature": false,
       "target": [
         {
