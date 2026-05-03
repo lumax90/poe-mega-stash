@@ -7,9 +7,15 @@ import ItemGrid from './components/ItemGrid'
 import ItemList from './components/ItemList'
 import ItemTooltip from './components/ItemTooltip'
 import SettingsPanel from './components/SettingsPanel'
+import DuplicateFinder from './components/DuplicateFinder'
+import WealthStrip from './components/WealthStrip'
+import WealthPanel from './components/WealthPanel'
+import AdvancedFilters from './components/AdvancedFilters'
+import ItemDetailPanel from './components/ItemDetailPanel'
 import SyncOverlay from './components/SyncOverlay'
 import LoginScreen from './components/LoginScreen'
-
+import SupportPanel from './components/SupportPanel'
+import GuidePanel from './components/GuidePanel'
 export default function App() {
   const {
     isLoggedIn,
@@ -18,6 +24,11 @@ export default function App() {
     items,
     isSyncing,
     settings,
+    isAdvancedFiltersOpen,
+    setAdvancedFiltersOpen,
+    selectedItem,
+    clearTooltip,
+    closeItemDetail,
     loadSavedData
   } = useAppStore()
 
@@ -28,6 +39,7 @@ export default function App() {
   // Show login/settings if no client ID and no POESESSID configured
   const needsSetup = !settings.clientId && !settings.poeSessId
   const isActuallyLoggedIn = isLoggedIn || !!settings.poeSessId
+  const showWealthView = isActuallyLoggedIn && currentView === 'wealth'
 
   return (
     <>
@@ -35,8 +47,16 @@ export default function App() {
       <div className="app-layout">
         <Sidebar />
         <div className="main-content">
-        {currentView === 'settings' ? (
+        {currentView === 'guide' ? (
+          <GuidePanel />
+        ) : currentView === 'buymeacoffee' ? (
+          <SupportPanel />
+        ) : currentView === 'settings' ? (
           <SettingsPanel />
+        ) : currentView === 'duplicates' ? (
+          <DuplicateFinder />
+        ) : showWealthView ? (
+          <WealthPanel />
         ) : needsSetup ? (
           <LoginScreen mode="setup" />
         ) : !isActuallyLoggedIn ? (
@@ -46,12 +66,37 @@ export default function App() {
         ) : (
           <>
             <SearchBar />
+            <WealthStrip />
             <Toolbar />
             {viewMode === 'grid' ? <ItemGrid /> : <ItemList />}
+            {isAdvancedFiltersOpen && (
+              <>
+                <div
+                  className="drawer-backdrop"
+                  onClick={() => {
+                    clearTooltip()
+                    setAdvancedFiltersOpen(false)
+                  }}
+                />
+                <AdvancedFilters />
+              </>
+            )}
           </>
         )}
       </div>
-      <ItemTooltip />
+      {!isAdvancedFiltersOpen && !selectedItem && <ItemTooltip />}
+      {selectedItem && (
+        <>
+          <div
+            className="item-detail-backdrop"
+            onClick={() => {
+              clearTooltip()
+              closeItemDetail()
+            }}
+          />
+          <ItemDetailPanel />
+        </>
+      )}
       {isSyncing && <SyncOverlay />}
       </div>
     </>

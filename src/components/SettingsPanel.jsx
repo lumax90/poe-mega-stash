@@ -1,12 +1,41 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAppStore } from '../store/app-store'
 
 export default function SettingsPanel() {
   const { settings, setSettings } = useAppStore()
   const [form, setForm] = useState(settings)
   const [saved, setSaved] = useState(false)
+  const [leagues, setLeagues] = useState([])
+  const [leaguesLoading, setLeaguesLoading] = useState(true)
+  const [leaguesError, setLeaguesError] = useState(null)
 
   useEffect(() => { setForm(settings) }, [settings])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      setLeaguesLoading(true)
+      setLeaguesError(null)
+      try {
+        const res = await window.poeApi.fetchLeagues()
+        if (cancelled) return
+        if (res.ok && Array.isArray(res.leagues)) {
+          setLeagues(res.leagues)
+        } else {
+          setLeagues([])
+          setLeaguesError(res.error || 'Could not load leagues.')
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setLeagues([])
+          setLeaguesError(e?.message || String(e))
+        }
+      } finally {
+        if (!cancelled) setLeaguesLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   const handleSave = async () => {
     setSettings(form)
@@ -21,30 +50,25 @@ export default function SettingsPanel() {
 
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
 
+  const leagueOptions = useMemo(() => {
+    const cur = form.league || 'Standard'
+    const base =
+      leagues.length > 0
+        ? leagues
+        : [
+            { id: 'Standard', text: 'Standard' },
+            { id: 'Hardcore', text: 'Hardcore' }
+          ]
+    if (base.some((l) => l.id === cur)) return base
+    return [...base, { id: cur, text: `${cur} (saved)` }]
+  }, [leagues, form.league])
+
   return (
     <div className="settings-container animate-in">
       <h2>Settings</h2>
 
       <div className="settings-section">
-        <h3>PoE OAuth Credentials (Recommended)</h3>
-        <div className="form-group">
-          <label className="form-label">Client ID</label>
-          <input className="form-input" value={form.clientId || ''} onChange={e => update('clientId', e.target.value)} placeholder="Your OAuth Client ID" />
-          <div className="form-hint">Get this from pathofexile.com/developer/docs</div>
-        </div>
-        <div className="form-group">
-          <label className="form-label">Client Secret (optional)</label>
-          <input className="form-input" type="password" value={form.clientSecret || ''} onChange={e => update('clientSecret', e.target.value)} placeholder="Your OAuth Client Secret" />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Contact Email</label>
-          <input className="form-input" value={form.contactEmail || ''} onChange={e => update('contactEmail', e.target.value)} placeholder="your@email.com" />
-          <div className="form-hint">Required by GGG for User-Agent header</div>
-        </div>
-      </div>
-
-      <div className="settings-section">
-        <h3>Alternative: POESESSID (No registration required)</h3>
+        <h3>Account (POESESSID)</h3>
         <div className="form-group">
           <label className="form-label">Account Name</label>
           <input className="form-input" value={form.accountName || ''} onChange={e => update('accountName', e.target.value)} placeholder="E.g. YourAccount#1234" />
@@ -60,12 +84,25 @@ export default function SettingsPanel() {
         <h3>Game Settings</h3>
         <div className="form-group">
           <label className="form-label">League</label>
-          <select className="form-select" value={form.league || 'Standard'} onChange={e => update('league', e.target.value)}>
-            <option value="Standard">Standard</option>
-            <option value="Hardcore">Hardcore</option>
-            <option value="Settlers">Settlers of Kalguur</option>
-            <option value="Hardcore Settlers">HC Settlers of Kalguur</option>
+          <select
+            className="form-select"
+            value={form.league || 'Standard'}
+            onChange={(e) => update('league', e.target.value)}
+            disabled={leaguesLoading && leagues.length === 0}
+          >
+            {leagueOptions.map((l) => (
+              <option key={l.id} value={l.id}>{l.text}</option>
+            ))}
           </select>
+          {leaguesLoading && <div className="form-hint">Loading leagues from pathofexile.com…</div>}
+          {leaguesError && (
+            <div className="form-hint" style={{ color: 'var(--warning)' }}>
+              Could not refresh league list: {leaguesError}. Using Standard/Hardcore fallback; your saved league is kept if it differs.
+            </div>
+          )}
+          <div className="form-hint">
+            Loaded from GGG trade data (PC). Ids match the stash API. Private leagues may be missing — your saved value still appears as an extra option when needed.
+          </div>
         </div>
       </div>
 

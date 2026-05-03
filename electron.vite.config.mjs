@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
       outDir: 'dist/main',
       lib: {
-        entry: 'electron/main.js'
+        entry: resolve(import.meta.dirname, 'electron/main.js')
       },
       rollupOptions: {
         external: ['electron', 'electron-store']
@@ -18,7 +18,7 @@ export default defineConfig({
     build: {
       outDir: 'dist/preload',
       lib: {
-        entry: 'electron/preload.js'
+        entry: resolve(import.meta.dirname, 'electron/preload.js')
       },
       rollupOptions: {
         external: ['electron']
@@ -28,7 +28,7 @@ export default defineConfig({
   renderer: {
     root: './src',
     build: {
-      outDir: '../dist/renderer',
+      outDir: resolve(import.meta.dirname, 'dist/renderer'),
       rollupOptions: {
         input: resolve(import.meta.dirname, 'src/index.html')
       }

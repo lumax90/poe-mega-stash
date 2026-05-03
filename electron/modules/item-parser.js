@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 const RARITY_MAP = {
   0: 'normal',
   1: 'magic',
@@ -25,6 +27,7 @@ class ItemParser {
       gridPos: { x: rawItem.x, y: rawItem.y }
     }
 
+    this.enrichSearchText(item)
     return item
   }
 
@@ -42,6 +45,7 @@ class ItemParser {
           characterLevel: charInfo.level,
           slot: rawItem.inventoryId || 'unknown'
         }
+        this.enrichSearchText(item)
         items.push(item)
       }
       return items
@@ -58,6 +62,7 @@ class ItemParser {
           characterLevel: charInfo.level,
           slot: rawItem.inventoryId || 'unknown'
         }
+        this.enrichSearchText(item)
         items.push(item)
       }
     }
@@ -73,6 +78,7 @@ class ItemParser {
           characterLevel: charInfo.level,
           slot: 'inventory'
         }
+        this.enrichSearchText(item)
         items.push(item)
       }
     }
@@ -88,6 +94,7 @@ class ItemParser {
           characterLevel: charInfo.level,
           slot: 'passive-tree-jewel'
         }
+        this.enrichSearchText(item)
         items.push(item)
       }
     }
@@ -148,6 +155,30 @@ class ItemParser {
       searchText: searchParts.join(' ').toLowerCase(),
       location: null // will be set by parseStashItem or parseCharacterItems
     }
+  }
+
+  enrichSearchText(item) {
+    const location = item.location || {}
+    const parts = [
+      item.searchText,
+      location.type,
+      location.tabName,
+      location.tabType,
+      location.characterName,
+      location.characterClass,
+      location.slot,
+      item.corrupted ? 'corrupted' : '',
+      item.identified ? 'identified' : 'unidentified',
+      item.sockets?.colors,
+      item.sockets?.total > 0 ? `${item.sockets.total} sockets` : '',
+      item.sockets?.maxLink > 0 ? `${item.sockets.maxLink}-link` : '',
+      item.sockets?.maxLink > 0 ? `${item.sockets.maxLink} link` : '',
+      item.itemLevel > 0 ? `ilvl ${item.itemLevel}` : '',
+      item.stackSize ? `stack ${item.stackSize}` : ''
+    ]
+
+    item.searchText = parts.filter(Boolean).join(' ').toLowerCase()
+    return item
   }
 
   parseSockets(rawSockets) {

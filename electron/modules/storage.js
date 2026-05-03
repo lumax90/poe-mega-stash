@@ -18,6 +18,7 @@ class StorageManager {
           poeSessId: '',
           accountName: ''
         },
+        itemValueOverrides: {},
         auth: {
           accessToken: null,
           refreshToken: null,
@@ -27,6 +28,10 @@ class StorageManager {
         data: {
           items: [],
           lastSync: null
+        },
+        wealth: {
+          lastEstimate: null,
+          history: []
         }
       }
     })
@@ -67,6 +72,65 @@ class StorageManager {
   // Sync
   getSyncTime() { return this.store?.get('data.lastSync') }
   saveSyncTime(ts) { this.store?.set('data.lastSync', ts) }
+
+  getWealth() {
+    return this.store?.get('wealth') || { lastEstimate: null, history: [] }
+  }
+
+  /** Snapshot shape from ninja-pricing. Dedupe: replace last entry if same league within 5 min. */
+  recordWealthSnapshot(snapshot) {
+    const prev = this.getWealth()
+    const hist = Array.isArray(prev.history) ? [...prev.history] : []
+    const last = hist[hist.length - 1]
+    if (
+      last &&
+      last.league === snapshot.league &&
+      snapshot.ts - last.ts < 5 * 60 * 1000
+    ) {
+      hist[hist.length - 1] = snapshot
+    } else {
+      hist.push(snapshot)
+    }
+    const capped = hist.length > 400 ? hist.slice(-400) : hist
+    this.store?.set('wealth', {
+      lastEstimate: snapshot,
+      history: capped
+    })
+  }
+
+  clearWealthHistory() {
+    this.store?.set('wealth', {
+      lastEstimate: null,
+      history: []
+    })
+  }
+
+  /** Per-item manual Divine valuation for whole stack (persists across ninja refresh). */
+  getItemValueOverrides() {
+    return this.store?.get('itemValueOverrides') || {}
+  }
+
+  setItemValueOverride(itemId, divineTotal) {
+    const id = String(itemId)
+    const all = { ...this.getItemValueOverrides() }
+    if (divineTotal == null || divineTotal === '' || Number.isNaN(Number(divineTotal))) {
+      delete all[id]
+    } else {
+      const n = Number(divineTotal)
+      if (!Number.isFinite(n) || n < 0) delete all[id]
+      else all[id] = { divineTotal: Math.round(n * 10000) / 10000, updatedAt: Date.now() }
+    }
+    this.store?.set('itemValueOverrides', all)
+    return all
+  }
+
+  removeItemValueOverride(itemId) {
+    const id = String(itemId)
+    const all = { ...this.getItemValueOverrides() }
+    delete all[id]
+    this.store?.set('itemValueOverrides', all)
+    return all
+  }
 }
 
 module.exports = { StorageManager }

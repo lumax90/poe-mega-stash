@@ -4,6 +4,10 @@
   "description": "Universal item search engine for Path of Exile",
   "main": "./electron/main.js",
   "scripts": {
+    "sync-guide": "node scripts/sync-guide.mjs",
+    "postinstall": "node scripts/sync-guide.mjs",
+    "predev": "node scripts/sync-guide.mjs",
+    "prebuild": "node scripts/sync-guide.mjs",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview"
@@ -24,8 +28,8 @@
     "fuse.js": "^7.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-virtualized-auto-sizer": "^2.0.3",
-    "react-window": "^1.8.10",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "vite": "^6.0.0",
     "zustand": "^5.0.5"
   },

@@ -22,6 +22,20 @@ contextBridge.exposeInMainWorld('poeApi', {
     return () => ipcRenderer.removeListener('sync:progress', handler)
   },
 
+  // Leagues (official trade data API — PC realm)
+  fetchLeagues: () => ipcRenderer.invoke('leagues:list'),
+
+  getWealth: () => ipcRenderer.invoke('wealth:get'),
+  refreshWealth: () => ipcRenderer.invoke('wealth:refresh'),
+  clearWealthHistory: () => ipcRenderer.invoke('wealth:clearHistory'),
+
+  estimateOneValuation: (item) => ipcRenderer.invoke('valuation:estimate-one', item),
+  getItemValueOverrides: () => ipcRenderer.invoke('item-value:get-all'),
+  setItemValue: (payload) => ipcRenderer.invoke('item-value:set', payload),
+  removeItemValue: (itemId) => ipcRenderer.invoke('item-value:remove', itemId),
+  openTradeSearch: (payload) => ipcRenderer.invoke('trade:open-search', payload),
+  openExternal: (url) => ipcRenderer.invoke('shell:open-external', url),
+
   // Storage
   getSavedData: () => ipcRenderer.invoke('storage:get'),
   getSettings: () => ipcRenderer.invoke('settings:get'),

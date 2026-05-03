@@ -1,4 +1,9 @@
 const API_BASE = 'https://api.pathofexile.com'
+/** Public league list (same ids as stash/trade). No OAuth. Cached in-process. */
+const TRADE_LEAGUES_URL = 'https://www.pathofexile.com/api/trade/data/leagues'
+const TRADE_LEAGUES_TTL_MS = 60 * 60 * 1000
+
+let tradeLeaguesCache = { at: 0, list: null }
 
 // Rate limiting: max ~30 requests per minute
 const REQUEST_DELAY_MS = 2100 // ~28 requests/minute to be safe
@@ -96,6 +101,37 @@ class ApiClient {
     } else {
       return await this.request(`/character/${encodeURIComponent(characterName)}`)
     }
+  }
+
+  /**
+   * PC realm leagues from official trade data endpoint (`result[].id` matches stash `league` param).
+   */
+  async getLeaguesTradePc() {
+    if (tradeLeaguesCache.list && Date.now() - tradeLeaguesCache.at < TRADE_LEAGUES_TTL_MS) {
+      return tradeLeaguesCache.list
+    }
+    const settings = this.storage.getSettings()
+    const ua = settings.poeSessId
+      ? `PoE-Item-Finder/1.0.0 (contact: ${settings.contactEmail || 'unknown'})`
+      : `OAuth ${settings.clientId || 'poe-item-finder'}/1.0.0 (contact: ${settings.contactEmail || 'unknown'})`
+    const response = await fetch(TRADE_LEAGUES_URL, {
+      headers: { 'User-Agent': ua }
+    })
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`Leagues ${response.status}: ${text.slice(0, 200)}`)
+    }
+    const json = await response.json()
+    const rows = json.result || []
+    const seen = new Set()
+    const pc = []
+    for (const r of rows) {
+      if (r.realm !== 'pc' || !r.id || seen.has(r.id)) continue
+      seen.add(r.id)
+      pc.push({ id: r.id, text: r.text || r.id })
+    }
+    tradeLeaguesCache = { at: Date.now(), list: pc }
+    return pc
   }
 
   sleep(ms) {

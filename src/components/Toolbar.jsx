@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/app-store'
+import { SORT_OPTIONS } from '../lib/item-sort-stats'
 
 const RARITY_OPTIONS = [
   { key: 'normal', label: 'Normal', color: 'var(--rarity-normal)' },
@@ -26,7 +27,15 @@ export default function Toolbar() {
     setIsSyncing,
     setSyncProgress,
     setItems,
-    setLastSync
+    setLastSync,
+    isAdvancedFiltersOpen,
+    setAdvancedFiltersOpen,
+    clearTooltip,
+    sortKey,
+    sortDescending,
+    setSortKey,
+    toggleSortDescending,
+    setWealthSummary
   } = useAppStore()
 
   const handleSync = async () => {
@@ -45,6 +54,16 @@ export default function Toolbar() {
       if (result.success) {
         setItems(result.items)
         setLastSync(Date.now())
+        if (result.wealth) {
+          setWealthSummary(result.wealth)
+        } else {
+          try {
+            const w = await window.poeApi.getWealth()
+            setWealthSummary(w?.lastEstimate ?? null)
+          } catch {
+            /* ignore */
+          }
+        }
       }
     } catch (err) {
       console.error('Sync failed:', err)
@@ -59,6 +78,18 @@ export default function Toolbar() {
   for (const item of items) {
     rarityCounts[item.rarity] = (rarityCounts[item.rarity] || 0) + 1
   }
+
+  const advancedFilterCount =
+    filters.categories.length +
+    (filters.corrupted !== 'any' ? 1 : 0) +
+    (filters.identified !== 'any' ? 1 : 0) +
+    (filters.minItemLevel ? 1 : 0) +
+    (filters.maxItemLevel ? 1 : 0) +
+    (filters.minLinks ? 1 : 0) +
+    (filters.minSockets ? 1 : 0) +
+    (filters.minQuality ? 1 : 0) +
+    (filters.modText ? 1 : 0) +
+    (filters.locationText ? 1 : 0)
 
   return (
     <div className="toolbar">
@@ -90,6 +121,33 @@ export default function Toolbar() {
         </button>
       ))}
 
+      <div className="toolbar-separator" />
+
+      <span className="toolbar-label">Sort:</span>
+      <select
+        className="toolbar-sort-select"
+        value={sortKey}
+        onChange={(e) => {
+          clearTooltip()
+          setSortKey(e.target.value)
+        }}
+      >
+        {SORT_OPTIONS.map(opt => (
+          <option key={opt.key} value={opt.key}>{opt.label}</option>
+        ))}
+      </select>
+      <button
+        type="button"
+        className="btn btn-sm btn-secondary toolbar-sort-dir"
+        title={sortDescending ? 'High → low' : 'Low → high'}
+        onClick={() => {
+          clearTooltip()
+          toggleSortDescending()
+        }}
+      >
+        {sortDescending ? '↓' : '↑'}
+      </button>
+
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
         <div className="view-toggle">
           <button
@@ -103,6 +161,16 @@ export default function Toolbar() {
             title="List view"
           >☰</button>
         </div>
+
+        <button
+          className={`btn btn-sm ${isAdvancedFiltersOpen || advancedFilterCount > 0 ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => {
+            clearTooltip()
+            setAdvancedFiltersOpen(!isAdvancedFiltersOpen)
+          }}
+        >
+          Filters{advancedFilterCount > 0 ? ` (${advancedFilterCount})` : ''}
+        </button>
 
         <button className="btn btn-sm btn-secondary" onClick={handleSync}>
           🔄 Sync

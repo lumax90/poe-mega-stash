@@ -5,15 +5,40 @@ export default function Sidebar() {
     currentView,
     setCurrentView,
     items,
+    filters,
+    setFilter,
     lastSync,
     isLoggedIn,
     accountName,
     isSyncing,
-    startSync
+    settings
   } = useAppStore()
+
+  const sessionReady = isLoggedIn || !!settings.poeSessId
 
   const stashItems = items.filter(i => i.location?.type === 'stash')
   const charItems = items.filter(i => i.location?.type === 'character')
+
+  const locTypes = filters.locationTypes
+  const isItemsView = currentView === 'items'
+  const stashOnlyActive = isItemsView && locTypes.length === 1 && locTypes[0] === 'stash'
+  const characterOnlyActive = isItemsView && locTypes.length === 1 && locTypes[0] === 'character'
+  const allItemsActive = isItemsView && !stashOnlyActive && !characterOnlyActive
+
+  const showAllItemsOnly = () => {
+    setCurrentView('items')
+    setFilter('locationTypes', [])
+  }
+
+  const showStashItemsOnly = () => {
+    setCurrentView('items')
+    setFilter('locationTypes', ['stash'])
+  }
+
+  const showCharacterItemsOnly = () => {
+    setCurrentView('items')
+    setFilter('locationTypes', ['character'])
+  }
 
   const formatTime = (ts) => {
     if (!ts) return 'Never'
@@ -35,67 +60,109 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="nav-section-title">Navigation</div>
+        <div className="sidebar-nav-groups">
+          <div className="nav-section-title">Navigation</div>
 
-        <div
-          className={`nav-item ${currentView === 'items' ? 'active' : ''}`}
-          onClick={() => setCurrentView('items')}
-        >
-          <span className="nav-icon">📦</span>
-          <span>All Items</span>
-          {items.length > 0 && (
-            <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
-              {items.length.toLocaleString()}
-            </span>
+          <div className="nav-all-items-group">
+            <div
+              className={`nav-item ${allItemsActive ? 'active' : ''}`}
+              onClick={showAllItemsOnly}
+            >
+              <span className="nav-icon">📦</span>
+              <span>All Items</span>
+              {items.length > 0 && (
+                <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
+                  {items.length.toLocaleString()}
+                </span>
+              )}
+            </div>
+
+            {items.length > 0 && (
+              <div className="nav-subitems">
+                <div
+                  className={`nav-item nav-subitem ${stashOnlyActive ? 'active' : ''}`}
+                  onClick={showStashItemsOnly}
+                >
+                  <span className="nav-icon">📦</span>
+                  <span>Stash Items</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
+                    {stashItems.length.toLocaleString()}
+                  </span>
+                </div>
+                <div
+                  className={`nav-item nav-subitem ${characterOnlyActive ? 'active' : ''}`}
+                  onClick={showCharacterItemsOnly}
+                >
+                  <span className="nav-icon">👤</span>
+                  <span>Character Items</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
+                    {charItems.length.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {(sessionReady || items.length > 0) && (
+            <>
+              <div className="nav-section-title">Tools</div>
+
+              {sessionReady && (
+                <div
+                  className={`nav-item ${currentView === 'wealth' ? 'active' : ''}`}
+                  onClick={() => setCurrentView('wealth')}
+                >
+                  <span className="nav-icon">📈</span>
+                  <span>Wealth</span>
+                </div>
+              )}
+
+              {items.length > 0 && (
+                <div
+                  className={`nav-item ${currentView === 'duplicates' ? 'active' : ''}`}
+                  onClick={() => setCurrentView('duplicates')}
+                >
+                  <span className="nav-icon">⧉</span>
+                  <span>Duplicate Finder</span>
+                </div>
+              )}
+            </>
           )}
         </div>
 
-        <div
-          className={`nav-item ${currentView === 'settings' ? 'active' : ''}`}
-          onClick={() => setCurrentView('settings')}
-        >
-          <span className="nav-icon">⚙️</span>
-          <span>Settings</span>
+        <div className="sidebar-nav-settings">
+          <div
+            className={`nav-item ${currentView === 'guide' ? 'active' : ''}`}
+            onClick={() => setCurrentView('guide')}
+          >
+            <span className="nav-icon">📖</span>
+            <span>Guide</span>
+          </div>
+          <div
+            className={`nav-item ${currentView === 'settings' ? 'active' : ''}`}
+            onClick={() => setCurrentView('settings')}
+          >
+            <span className="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </div>
         </div>
 
-        {items.length > 0 && (
-          <>
-            <div className="nav-section-title">Breakdown</div>
-
-            <div className="nav-item" style={{ cursor: 'default', opacity: 0.7 }}>
-              <span className="nav-icon">📦</span>
-              <span>Stash Items</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
-                {stashItems.length.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="nav-item" style={{ cursor: 'default', opacity: 0.7 }}>
-              <span className="nav-icon">👤</span>
-              <span>Character Items</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, opacity: 0.5 }}>
-                {charItems.length.toLocaleString()}
-              </span>
-            </div>
-          </>
-        )}
+        <div className="sidebar-nav-support">
+          <div
+            className={`nav-item ${currentView === 'buymeacoffee' ? 'active' : ''}`}
+            onClick={() => setCurrentView('buymeacoffee')}
+          >
+            <span className="nav-icon">☕</span>
+            <span>Buy Me a Coffee</span>
+          </div>
+        </div>
       </nav>
 
       <div className="sidebar-footer">
         {isLoggedIn && (
-          <div className="sync-status" style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: 12 }}>👤</span>
-              <span style={{ color: 'var(--text-secondary)', marginLeft: 4 }}>{accountName || 'Connected'}</span>
-            </div>
-            <button 
-              className="btn btn-primary btn-sm" 
-              onClick={startSync}
-              disabled={isSyncing}
-              style={{ padding: '0 8px', height: 24, fontSize: 11 }}
-            >
-              {isSyncing ? 'Syncing...' : 'Sync Now'}
-            </button>
+          <div className="sync-status" style={{ marginBottom: 8 }}>
+            <span style={{ fontSize: 12 }}>👤</span>
+            <span style={{ color: 'var(--text-secondary)', marginLeft: 4 }}>{accountName || 'Connected'}</span>
           </div>
         )}
         <div className="sync-status">
