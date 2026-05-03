@@ -2,7 +2,6 @@
 
 Desktop companion for **Path of Exile** (PC): stash + character gear sync, search/filter, optional wealth estimate, duplicates, and **pathofexile.com trade** links from item mods.
 
-**Built with AI.** Although everything has been reviewed, use it with caution.
 
 ## Screenshots
 
