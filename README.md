@@ -1,8 +1,8 @@
 # PoE Mega Stash
 
-**PoE Mega Stash** is a desktop companion for **Path of Exile** on PC. You can sync your **stash tabs** and **character** gear, search and filter everything in one place, optionally estimate stash wealth, find duplicates, and open **official pathofexile.com trade** searches built from your items’ mods.
+**PoE Mega Stash** is a desktop app for **Path of Exile** on PC. You can sync your **stash tabs** and **character** gear, search and filter everything in one place, optionally estimate stash wealth, find duplicates, and open **official pathofexile.com trade** searches built from your items’ mods.
 
-The text below is also available inside the app: open **Guide** from the sidebar (bottom, next to **Settings**).
+## This app is builth with AI. Alltough I have checked everything it generated -still, use it with caution.
 
 ---
 
@@ -10,9 +10,12 @@ The text below is also available inside the app: open **Guide** from the sidebar
 
 - **Windows, macOS, or Linux** (the app uses Electron).
 - To run from source: **Node.js 18+** and npm.
-- A Path of Exile account you’re allowed to use with **GGG’s APIs** (see **First launch**).
+- A Path of Exile account.
 
 ---
+## Download the setup file from releases.
+
+or
 
 ## Install and run (from source)
 
