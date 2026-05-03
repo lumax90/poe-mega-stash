@@ -111,11 +111,51 @@
       margin-bottom: 8px;
     }
 
-    .hero .lead {
+    .hero     .lead {
       font-size: 16px;
       color: var(--muted);
       max-width: 640px;
-      margin-bottom: 28px;
+      margin-bottom: 14px;
+    }
+
+    .release-meta {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+    }
+
+    .release-meta-label {
+      color: var(--muted);
+    }
+
+    .release-version-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .release-meta a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .release-meta a:hover {
+      text-decoration: underline;
+    }
+
+    .release-meta-sep {
+      opacity: 0.45;
+      user-select: none;
     }
 
     .downloads {
@@ -350,6 +390,15 @@
         Desktop companion for <strong>Path of Exile</strong>. Sync stash &amp; character gear, search and filter, optional wealth tools, duplicates, and trade links — without digging through GitHub.
       </p>
 
+      <p id="release-meta" class="release-meta" aria-live="polite">
+        <span class="release-meta-label">Latest release</span>
+        <span id="release-version" class="release-version-tag">…</span>
+        <span id="release-sep-notes" class="release-meta-sep" hidden aria-hidden="true">·</span>
+        <a id="release-notes-link" href="#" hidden>Release notes</a>
+        <span class="release-meta-sep" aria-hidden="true">·</span>
+        <a href="https://github.com/lumax90/poe-mega-stash/releases" target="_blank" rel="noopener noreferrer">All releases</a>
+      </p>
+
       <div class="downloads">
         <div class="dl-card">
           <span class="platform">macOS · Apple Silicon</span>
@@ -359,8 +408,9 @@
         </div>
 
         <div class="dl-card">
-          <span class="platform">Windows</span>
+          <span class="platform">Windows · x64</span>
           <a id="btn-win-download" class="btn btn-primary" href="#" style="display:none">Download installer (.exe)</a>
+          <a id="btn-win-zip" class="btn btn-secondary" href="#" style="display:none">Download ZIP (portable)</a>
           <button id="btn-win-soon" type="button" class="btn coming" disabled style="display:none">Coming soon</button>
           <span id="btn-win-loading" class="btn btn-primary" style="opacity:.65;cursor:wait">Loading…</span>
           <p class="dl-note" id="win-note">Detects <code>.exe</code> when you publish a Windows build.</p>
@@ -417,20 +467,49 @@
     }
 
     async function loadDownloads() {
+      const verEl = document.getElementById('release-version');
+      const notesLink = document.getElementById('release-notes-link');
+      const sepNotes = document.getElementById('release-sep-notes');
+
       const dmgBtn = document.getElementById('btn-mac-dmg');
       const zipBtn = document.getElementById('btn-mac-zip');
       const winDl = document.getElementById('btn-win-download');
+      const winZip = document.getElementById('btn-win-zip');
       const winSoon = document.getElementById('btn-win-soon');
       const winLoading = document.getElementById('btn-win-loading');
       const winNote = document.getElementById('win-note');
 
       dmgBtn.href = RELEASES_LATEST;
       zipBtn.href = RELEASES_LATEST;
+      winZip.href = RELEASES_LATEST;
 
-      function showWin(state) {
+      function finishWinAssets({ exe, zipWin }) {
         winLoading.style.display = 'none';
-        winDl.style.display = state === 'exe' ? 'inline-flex' : 'none';
-        winSoon.style.display = state === 'soon' ? 'inline-flex' : 'none';
+
+        if (zipWin) {
+          winZip.href = zipWin.browser_download_url;
+          winZip.style.display = 'inline-flex';
+          if (!exe) {
+            winZip.classList.remove('btn-secondary');
+            winZip.classList.add('btn-primary');
+          } else {
+            winZip.classList.add('btn-secondary');
+            winZip.classList.remove('btn-primary');
+          }
+        } else {
+          winZip.style.display = 'none';
+          winZip.classList.add('btn-secondary');
+          winZip.classList.remove('btn-primary');
+        }
+
+        if (exe) {
+          winDl.href = exe.browser_download_url;
+          winDl.style.display = 'inline-flex';
+          winSoon.style.display = 'none';
+        } else {
+          winDl.style.display = 'none';
+          winSoon.style.display = zipWin ? 'none' : 'inline-flex';
+        }
       }
 
       try {
@@ -438,6 +517,16 @@
         if (!res.ok) throw new Error('api');
         const data = await res.json();
         const assets = data.assets || [];
+
+        const tag = (data.tag_name || data.name || '').trim();
+        verEl.textContent = tag || '—';
+        if (data.html_url) {
+          notesLink.href = data.html_url;
+          notesLink.hidden = false;
+          notesLink.target = '_blank';
+          notesLink.rel = 'noopener noreferrer';
+          sepNotes.hidden = false;
+        }
 
         const isBlockmap = (n) => /blockmap$/i.test(n);
 
@@ -456,6 +545,14 @@
           assets.find((a) => /\.exe$/i.test(a.name) && !isBlockmap(a.name)) ||
           assets.find((a) => /setup/i.test(a.name) && /\.exe$/i.test(a.name));
 
+        const zipWin = assets.find(
+          (a) =>
+            /\.zip$/i.test(a.name) &&
+            !isBlockmap(a.name) &&
+            !/mac|darwin|osx|apple/i.test(a.name) &&
+            (/[-_]win[-_]|windows|[-_]x64\.zip$/i.test(a.name) || /win.*x64/i.test(a.name))
+        );
+
         if (dmg) {
           dmgBtn.href = dmg.browser_download_url;
           dmgBtn.textContent = 'Download DMG';
@@ -471,19 +568,25 @@
           zipBtn.textContent = 'Download ZIP';
         }
 
-        if (exe) {
-          winDl.href = exe.browser_download_url;
+        finishWinAssets({ exe, zipWin });
+
+        if (exe && zipWin) {
+          winNote.textContent = 'Installer (.exe) or portable folder (.zip).';
+        } else if (exe) {
           winNote.textContent = 'Latest Windows build from this release.';
-          showWin('exe');
+        } else if (zipWin) {
+          winNote.textContent = 'Portable build (.zip). Add an .exe installer anytime.';
         } else {
-          winNote.textContent = 'When you publish a Windows .exe to Releases, this button will link automatically.';
-          showWin('soon');
+          winNote.textContent = 'When you publish Windows assets to Releases, links appear here.';
         }
       } catch (e) {
+        verEl.textContent = '—';
+        notesLink.hidden = true;
+        sepNotes.hidden = true;
         dmgBtn.textContent = 'Open Releases';
         dmgBtn.classList.remove('btn-primary');
         dmgBtn.classList.add('btn-secondary');
-        showWin('soon');
+        finishWinAssets({ exe: null, zipWin: null });
         winNote.textContent = 'Could not reach GitHub API — check Releases manually.';
       }
     }
