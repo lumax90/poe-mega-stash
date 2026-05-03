@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PoE Mega Stash — Download</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --border: #d0d7de;
+      --text: #1f2328;
+      --muted: #656d76;
+      --accent: #0969da;
+      --accent-muted: #ddf4ff;
+      --warning-bg: #fff8c5;
+      --warning-border: #d4a72c;
+      --radius: 8px;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+      --sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    /* —— Top bar —— */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .topbar-brand {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-nav a {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .topbar-nav a:hover {
+      background: #eaeef2;
+      border-color: var(--muted);
+    }
+
+    .topbar-nav a.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .topbar-nav a.primary:hover {
+      background: #0550ae;
+      border-color: #0550ae;
+    }
+
+    /* —— Layout —— */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+
+    .hero {
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.65rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero .lead {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 28px;
+    }
+
+    .downloads {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .dl-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dl-card .platform {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .dl-card .btn {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s ease, background 0.15s ease;
+    }
+
+    .dl-card .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .dl-card .btn-primary:hover:not(:disabled) {
+      background: #0550ae;
+    }
+
+    .dl-card .btn-secondary {
+      background: var(--surface);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .dl-card .btn-secondary:hover:not(:disabled) {
+      background: var(--accent-muted);
+    }
+
+    .dl-card .btn:disabled,
+    .dl-card .btn.coming {
+      background: var(--bg);
+      color: var(--muted);
+      border-color: var(--border);
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .dl-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    /* —— README section —— */
+    .doc-head {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .readme-shell {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .readme-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #eaeef2;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .readme-toolbar .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ffbd2e;
+      box-shadow: 16px 0 0 #28ca41, 32px 0 0 #ff6058;
+    }
+
+    #readme {
+      padding: 28px 32px 36px;
+      font-size: 15px;
+    }
+
+    #readme.loading {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Markdown prose (GitHub-ish light) */
+    .markdown-body h1 {
+      font-size: 1.75em;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.25em;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.35em;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .markdown-body h3 { font-size: 1.1em; font-weight: 600; margin-top: 20px; margin-bottom: 10px; }
+
+    .markdown-body p { margin-bottom: 12px; }
+
+    .markdown-body ul, .markdown-body ol {
+      margin-bottom: 12px;
+      padding-left: 1.6em;
+    }
+
+    .markdown-body li { margin-bottom: 4px; }
+
+    .markdown-body a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .markdown-body a:hover { text-decoration: underline; }
+
+    .markdown-body code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .markdown-body pre {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: #24292f;
+      color: #e6edf3;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+
+    .markdown-body pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    .markdown-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    .markdown-body strong { font-weight: 600; }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      #readme { padding: 20px 18px 28px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="topbar-brand" href="#">PoE Mega Stash</a>
+    <nav class="topbar-nav" aria-label="Links">
+      <a href="https://www.patreon.com/c/lumax90" target="_blank" rel="noopener noreferrer">Patreon</a>
+      <a href="https://buymeacoffee.com/lumax90" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>
+      <a class="primary" href="https://github.com/lumax90/poe-mega-stash" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <h1>PoE Mega Stash</h1>
+      <p class="lead">
+        Desktop companion for <strong>Path of Exile</strong>. Sync stash &amp; character gear, search and filter, optional wealth tools, duplicates, and trade links — without digging through GitHub.
+      </p>
+
+      <div class="downloads">
+        <div class="dl-card">
+          <span class="platform">macOS · Apple Silicon</span>
+          <a id="btn-mac-dmg" class="btn btn-primary" href="#" role="button">Loading DMG…</a>
+          <a id="btn-mac-zip" class="btn btn-secondary" href="#" style="display:none">Download ZIP</a>
+          <p class="dl-note" id="mac-note">Opens the latest release DMG from GitHub.</p>
+        </div>
+
+        <div class="dl-card">
+          <span class="platform">Windows</span>
+          <a id="btn-win-download" class="btn btn-primary" href="#" style="display:none">Download installer (.exe)</a>
+          <button id="btn-win-soon" type="button" class="btn coming" disabled style="display:none">Coming soon</button>
+          <span id="btn-win-loading" class="btn btn-primary" style="opacity:.65;cursor:wait">Loading…</span>
+          <p class="dl-note" id="win-note">Detects <code>.exe</code> when you publish a Windows build.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="doc-heading">
+      <div class="doc-head" id="doc-heading">From README.md</div>
+      <div class="readme-shell">
+        <div class="readme-toolbar" aria-hidden="true">
+          <span class="dot"></span>
+          <span style="margin-left:36px">README.md · main</span>
+        </div>
+        <article id="readme" class="markdown-body loading">Fetching README…</article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Not affiliated with Grinding Gear Games · Session data stays on your machine · lumax90/poe-mega-stash
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script>
+    const REPO = 'lumax90/poe-mega-stash';
+    const RELEASES_LATEST = `https://github.com/${REPO}/releases/latest`;
+    const README_RAW = `https://raw.githubusercontent.com/${REPO}/main/README.md`;
+
+    function externalizeLinks(container) {
+      container.querySelectorAll('a[href^="http"]').forEach((a) => {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+      });
+    }
+
+    async function loadReadme() {
+      const el = document.getElementById('readme');
+      try {
+        const res = await fetch(README_RAW);
+        if (!res.ok) throw new Error(String(res.status));
+        const md = await res.text();
+        el.classList.remove('loading');
+        if (typeof marked === 'undefined') throw new Error('marked');
+        el.innerHTML = marked.parse(md);
+        externalizeLinks(el);
+      } catch (e) {
+        el.classList.remove('loading');
+        el.innerHTML =
+          '<p>Could not load README. Open the repo on GitHub instead.</p>' +
+          `<p><a href="https://github.com/${REPO}#readme">View README on GitHub ↗</a></p>`;
+        externalizeLinks(el);
+      }
+    }
+
+    async function loadDownloads() {
+      const dmgBtn = document.getElementById('btn-mac-dmg');
+      const zipBtn = document.getElementById('btn-mac-zip');
+      const winDl = document.getElementById('btn-win-download');
+      const winSoon = document.getElementById('btn-win-soon');
+      const winLoading = document.getElementById('btn-win-loading');
+      const winNote = document.getElementById('win-note');
+
+      dmgBtn.href = RELEASES_LATEST;
+      zipBtn.href = RELEASES_LATEST;
+
+      function showWin(state) {
+        winLoading.style.display = 'none';
+        winDl.style.display = state === 'exe' ? 'inline-flex' : 'none';
+        winSoon.style.display = state === 'soon' ? 'inline-flex' : 'none';
+      }
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        if (!res.ok) throw new Error('api');
+        const data = await res.json();
+        const assets = data.assets || [];
+
+        const isBlockmap = (n) => /blockmap$/i.test(n);
+
+        const dmg = assets.find(
+          (a) => /\.dmg$/i.test(a.name) && !isBlockmap(a.name) && (/arm64|aarch64/i.test(a.name) || /mac/i.test(a.name))
+        ) || assets.find((a) => /\.dmg$/i.test(a.name) && !isBlockmap(a.name));
+
+        const zipMac = assets.find(
+          (a) =>
+            /\.zip$/i.test(a.name) &&
+            !isBlockmap(a.name) &&
+            /mac/i.test(a.name)
+        );
+
+        const exe =
+          assets.find((a) => /\.exe$/i.test(a.name) && !isBlockmap(a.name)) ||
+          assets.find((a) => /setup/i.test(a.name) && /\.exe$/i.test(a.name));
+
+        if (dmg) {
+          dmgBtn.href = dmg.browser_download_url;
+          dmgBtn.textContent = 'Download DMG';
+        } else {
+          dmgBtn.textContent = 'Open Releases (DMG)';
+          dmgBtn.classList.remove('btn-primary');
+          dmgBtn.classList.add('btn-secondary');
+        }
+
+        if (zipMac) {
+          zipBtn.href = zipMac.browser_download_url;
+          zipBtn.style.display = 'inline-flex';
+          zipBtn.textContent = 'Download ZIP';
+        }
+
+        if (exe) {
+          winDl.href = exe.browser_download_url;
+          winNote.textContent = 'Latest Windows build from this release.';
+          showWin('exe');
+        } else {
+          winNote.textContent = 'When you publish a Windows .exe to Releases, this button will link automatically.';
+          showWin('soon');
+        }
+      } catch (e) {
+        dmgBtn.textContent = 'Open Releases';
+        dmgBtn.classList.remove('btn-primary');
+        dmgBtn.classList.add('btn-secondary');
+        showWin('soon');
+        winNote.textContent = 'Could not reach GitHub API — check Releases manually.';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadReadme();
+      loadDownloads();
+    });
+  </script>
+</body>
+</html>

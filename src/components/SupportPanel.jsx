@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAppStore } from '../store/app-store'
 import {
   SUPPORT_PRIMARY_BUYMEACOFFEE,
+  SUPPORT_PATREON_URL,
   SUPPORT_LINKS,
   SUPPORT_SOURCE_URL
 } from '../config/support-links'
@@ -24,17 +25,18 @@ export default function SupportPanel() {
 
   const extraLinks = SUPPORT_LINKS.filter((l) => String(l.url || '').trim())
   const primary = String(SUPPORT_PRIMARY_BUYMEACOFFEE || '').trim()
+  const patreon = String(SUPPORT_PATREON_URL || '').trim()
 
   return (
     <div className="settings-container support-panel animate-in">
-      <h2>Buy Me a Coffee</h2>
+      <h2>Support</h2>
       <p className="support-intro">
-        PoE Mega Stash stays free. If you want to say thanks, you can leave a tip — totally optional.
+        PoE Mega Stash stays free. If you want to say thanks, you can use Buy Me a Coffee or Patreon — totally optional.
       </p>
 
       {lastError && <div className="support-error">{lastError}</div>}
 
-      <div className="support-actions">
+      <div className="support-actions support-actions-main">
         {primary ? (
           <div className="support-link-card support-link-card-primary">
             <button type="button" className="btn btn-primary" onClick={() => openUrl(primary)}>
@@ -42,9 +44,20 @@ export default function SupportPanel() {
             </button>
             <p className="form-hint">Opens in your browser.</p>
           </div>
-        ) : (
-          <p className="form-hint">Support link is not available right now.</p>
-        )}
+        ) : null}
+
+        {patreon ? (
+          <div className="support-link-card support-link-card-patreon">
+            <button type="button" className="btn btn-secondary support-btn-patreon" onClick={() => openUrl(patreon)}>
+              Patreon
+            </button>
+            <p className="form-hint">Opens in your browser.</p>
+          </div>
+        ) : null}
+
+        {!primary && !patreon ? (
+          <p className="form-hint">Support links are not available right now.</p>
+        ) : null}
 
         {extraLinks.map((link) => (
           <div key={link.key} className="support-link-card">

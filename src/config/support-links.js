@@ -4,6 +4,8 @@
  */
 export const SUPPORT_PRIMARY_BUYMEACOFFEE = 'https://buymeacoffee.com/lumax90'
 
+export const SUPPORT_PATREON_URL = 'https://www.patreon.com/c/lumax90'
+
 export const SUPPORT_LINKS = [
   {
     key: 'kofi',

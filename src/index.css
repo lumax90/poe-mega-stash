@@ -1814,6 +1814,31 @@ select,
   gap: 16px;
 }
 
+.support-actions-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 520px) {
+  .support-actions-main {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.support-link-card-patreon .support-btn-patreon {
+  border-color: rgba(255, 105, 122, 0.55);
+  color: #ffb0b8;
+  background: rgba(255, 66, 77, 0.12);
+}
+
+.support-link-card-patreon .support-btn-patreon:hover {
+  background: rgba(255, 66, 77, 0.22);
+  border-color: rgba(255, 105, 122, 0.75);
+  color: #ffd4d8;
+}
+
 .support-link-card .btn {
   width: fit-content;
 }
