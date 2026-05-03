@@ -73,6 +73,9 @@
       ]
     },
     "win": {
+      "signAndEditExecutable": false,
+      "signDlls": false,
+      "verifyUpdateCodeSignature": false,
       "target": [
         {
           "target": "nsis",
